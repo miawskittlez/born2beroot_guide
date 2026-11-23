@@ -1,70 +1,60 @@
 # Defense preparation
 
-You will be asked to explain and demonstrate. Make sure you can answer in your own words:
+Be ready to explain and demonstrate:
 
-- Why Debian (or Rocky), and how they differ
-- `apt` vs `aptitude`; what AppArmor (or SELinux) is
-- What LVM is (physical volume, volume group, logical volume) and why the disk is encrypted
-- How SSH works, why root login is disabled, and why the port is 4242
-- How UFW works and how to open or close a port
-- How sudo is configured, and what each line of your sudoers file does
-- How the password policy is enforced
-- How cron works, how your script collects each value, and how to stop it without editing it
-- Live tasks: create a new user and assign it to a group, change the hostname, add/remove a firewall rule
+- Why Debian, and how it differs from Rocky
+- `apt` vs `aptitude`, and what AppArmor is
+- What LVM is and why the disk is encrypted
+- How SSH, UFW, sudo and the password policy work
+- How cron works and how your script collects each value
+- Live: create a user and group, change the hostname, open and close a firewall port, stop the monitoring script
 
 
-## Concept questions (with short answers in my own words)
+## Concept questions
 
-Use these to check your understanding. Do not memorize them word for word: the evaluator will ask follow-up questions.
+Short answers to check your understanding. The evaluator will ask follow-ups, so understand them rather than memorize them.
 
-**What is a virtual machine and what is a hypervisor?**
-A VM is a software-emulated computer with its own virtual CPU, memory, disk and network that runs its own operating system. The hypervisor (here VirtualBox) is the program that creates VMs and shares the host's real hardware between them while keeping them isolated.
+**Virtual machine / hypervisor?**
+A VM is a software-emulated computer with its own virtual CPU, memory, disk and network. The hypervisor (VirtualBox) creates VMs and shares the host's hardware between them.
 
-**Why did you choose Debian, and how does it differ from Rocky?**
-Debian is a community-driven, stable distribution that is friendly to beginners and widely documented. Rocky is a community rebuild that is compatible with Red Hat Enterprise Linux. In practice: Debian uses `apt`/`dpkg` (`.deb` packages), AppArmor and UFW; Rocky uses `dnf`/`rpm` (`.rpm` packages), SELinux and firewalld.
+**Debian vs Rocky?**
+Debian: community-driven, `apt`/`dpkg`, AppArmor, UFW. Rocky: Red Hat Enterprise Linux compatible, `dnf`/`rpm`, SELinux, firewalld.
 
-**What is the difference between `apt` and `aptitude`?**
-Both manage packages on top of `dpkg`, which installs single `.deb` files but does not resolve dependencies. `apt` is the standard command-line tool that resolves and downloads dependencies. `aptitude` is a higher-level front-end with a text interface and a more elaborate dependency solver that can propose alternative solutions when there is a conflict.
+**`apt` vs `aptitude`?**
+Both sit on top of `dpkg` and resolve dependencies. `apt` is the standard command-line tool. `aptitude` has a text interface and a more elaborate dependency solver.
 
-**What is AppArmor?**
-A Linux security module that provides Mandatory Access Control. Each program can be confined by a profile that lists which files, capabilities and network resources it may use. In *enforce* mode violations are blocked; in *complain* mode they are only logged. Check it with `sudo aa-status`.
+**AppArmor?**
+Mandatory Access Control: each program is confined by a profile. *Enforce* mode blocks violations, *complain* mode only logs them. Check with `sudo aa-status`.
 
-**What is LVM and why use it?**
-LVM is a layer between the disks and the file systems. A **physical volume** (PV) is a disk or partition, a **volume group** (VG) pools one or more PVs, and **logical volumes** (LVs) are carved out of the VG and hold file systems or swap. The benefit is flexibility: you can resize LVs without worrying about contiguous disk space. In this project the LVM sits on top of an **encrypted** partition (LUKS), so the data on disk is protected without a passphrase.
+**LVM?**
+PV (disk/partition) > VG (pool) > LV (what you mount). LVs can be resized easily. Here it runs inside an encrypted (LUKS) partition.
 
-**What is SSH and why disable root login?**
-SSH is an encrypted protocol for remote shell access. Root is the most targeted account, so forbidding it forces attackers to guess a username as well as a password, and gives you accountability through named users plus `sudo`. The port is changed to 4242 to reduce automated scans on the default port 22.
+**SSH, and why no root login?**
+Encrypted remote shell. Root is the most targeted account, so you log in as a normal user and use `sudo`. Port 4242 avoids default-port scans.
 
-**What is UFW?**
-"Uncomplicated Firewall", a simple front-end for the kernel firewall (iptables/nftables). You set rules such as `sudo ufw allow 4242` and look at them with `sudo ufw status`.
+**UFW?**
+A simple front-end to the kernel firewall. `sudo ufw allow 4242`, `sudo ufw status`.
 
-**What is `sudo` and why configure it strictly?**
-`sudo` lets permitted users run commands with root privileges and records them. The strict rules (limited attempts, TTY required, restricted `secure_path`, logs of inputs and outputs) reduce abuse and make actions auditable.
+**sudo?**
+Runs commands as root and logs them. The strict rules limit attempts and make actions auditable.
 
-**What is `cron`? What is `wall`?**
-`cron` is the scheduler that runs commands at fixed times (here, every 10 minutes through root's crontab). `wall` sends a message to every logged-in terminal.
+**cron and wall?**
+`cron` runs commands on a schedule. `wall` broadcasts a message to all terminals.
 
-**How does the password policy work?**
-Aging settings (`/etc/login.defs`, `chage`) control expiry; strength rules come from `libpam-pwquality` options in `/etc/pam.d/common-password`.
+## Live tasks to practice
 
-## Things the evaluator may ask you to do live
-
-| Task | How |
+| Task | Command |
 |---|---|
-| Show the OS and that there is no GUI | `cat /etc/os-release`, `ls /usr/bin/*session` (should find nothing graphical) |
-| Check partitions and LVM | `lsblk` |
-| Check UFW | `sudo ufw status` |
-| Check SSH | `sudo systemctl status ssh`, then connect with `ssh <login>@127.0.0.1 -p 4242` |
-| Check AppArmor | `sudo aa-status` |
-| Create a user and assign a group | `sudo adduser <name>`, `sudo usermod -aG user42 <name>`, `getent group user42` |
-| Check the new user's password rules | `sudo chage -l <name>` |
-| Change the hostname | `sudo hostnamectl set-hostname <new>`, edit `/etc/hosts`, `sudo reboot` |
-| Open or close a port | `sudo ufw allow <port>`, `sudo ufw delete allow <port>` |
-| Show the sudo log | `sudo ls /var/log/sudo/` |
-| Stop the monitoring broadcast without editing the script | comment the line in `sudo crontab -u root -e`, or `sudo systemctl stop cron` |
-| Explain the script | walk through it line by line |
-
-> Verify these on your own machine before the defense, because the exact tasks depend on your evaluator.
+| Show OS | `cat /etc/os-release` |
+| Partitions / LVM | `lsblk` |
+| Firewall | `sudo ufw status` |
+| SSH status | `sudo systemctl status ssh` |
+| AppArmor | `sudo aa-status` |
+| New user + group | `sudo adduser <name>`, `sudo usermod -aG user42 <name>` |
+| User password rules | `sudo chage -l <name>` |
+| Change hostname | `sudo hostnamectl set-hostname <new>`, edit `/etc/hosts`, `sudo reboot` |
+| Open / close a port | `sudo ufw allow <port>`, `sudo ufw delete allow <port>` |
+| Stop the broadcast | comment the line in `sudo crontab -u root -e` |
 
 ---
 [< Previous](./06-troubleshooting.md) | [Back to README](../README.md) | [Next >](./08-cheatsheet-vim-nano.md)
