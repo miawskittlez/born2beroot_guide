@@ -10,10 +10,11 @@ su -
 apt update
 apt install sudo vim
 usermod -aG sudo <login>
+getent group sudo
 reboot
 ```
 
-Log in again and test with `sudo -v`.
+`getent group sudo` should list `<login>`. After the reboot, log in again and test with `sudo -v`.
 
 
 ## 3.2 Hostname
