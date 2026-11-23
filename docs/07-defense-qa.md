@@ -57,4 +57,4 @@ Runs commands as root and logs them. The strict rules limit attempts and make ac
 | Stop the broadcast | comment the line in `sudo crontab -u root -e` |
 
 ---
-[< Previous](./06-troubleshooting.md) | [Back to README](../README.md) | [Next >](./08-cheatsheet-vim-nano.md)
+[< Previous](./06-troubleshooting.md) | [Back to README](../README.md)

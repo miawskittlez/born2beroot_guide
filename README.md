@@ -15,7 +15,6 @@ From an empty VirtualBox to a signed submission. Also available as one file: [`B
 5. [Final checks and signature](docs/05-final-checks-and-signature.md)
 6. [Troubleshooting](docs/06-troubleshooting.md)
 7. [Defense preparation and Q&A](docs/07-defense-qa.md)
-8. [Cheat sheet: vim and nano](docs/08-cheatsheet-vim-nano.md)
 
 ## Checklist
 
